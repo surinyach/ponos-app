@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../app/theme/app_spacing.dart';
 import 'widgets/today_summary.dart';
+import 'widgets/todays_objectives.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -92,11 +93,50 @@ class _OverviewContent extends StatelessWidget {
       child: SingleChildScrollView(
         padding: AppSpacing.pagePadding,
         child: ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: 720),
-          child: const TodaySummary(
-            completedObjectives: 3,
-            totalObjectives: 5,
-            focusedDuration: Duration(hours: 2, minutes: 35),
+          constraints: const BoxConstraints(maxWidth: 1040),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              const summary = TodaySummary(
+                completedObjectives: 3,
+                totalObjectives: 5,
+                focusedDuration: Duration(hours: 2, minutes: 35),
+              );
+              const objectives = TodaysObjectives(
+                objectives: [
+                  TodayObjective(
+                    title: 'Plan the week priorities',
+                    isCompleted: true,
+                  ),
+                  TodayObjective(
+                    title: 'Complete the project proposal',
+                    isCompleted: false,
+                  ),
+                  TodayObjective(
+                    title: 'Review focus session notes',
+                    isCompleted: false,
+                  ),
+                ],
+              );
+
+              if (constraints.maxWidth >= 840) {
+                return const Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(flex: 4, child: summary),
+                    SizedBox(width: AppSpacing.lg),
+                    Expanded(flex: 6, child: objectives),
+                  ],
+                );
+              }
+
+              return const Column(
+                children: [
+                  summary,
+                  SizedBox(height: AppSpacing.md),
+                  objectives,
+                ],
+              );
+            },
           ),
         ),
       ),
