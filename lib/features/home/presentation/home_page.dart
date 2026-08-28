@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/theme/app_spacing.dart';
+import 'widgets/today_summary.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -28,9 +29,9 @@ class _HomePageState extends State<HomePage> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final useNavigationRail = constraints.maxWidth >= 700;
-        final content = _FeaturePlaceholder(
-          destination: _destinations[_selectedIndex],
-        );
+        final content = _selectedIndex == 0
+            ? const _OverviewContent()
+            : _FeaturePlaceholder(destination: _destinations[_selectedIndex]);
 
         return Scaffold(
           appBar: AppBar(title: const Text('Ponos')),
@@ -78,6 +79,28 @@ class _HomePageState extends State<HomePage> {
 
   void _selectDestination(int index) {
     setState(() => _selectedIndex = index);
+  }
+}
+
+class _OverviewContent extends StatelessWidget {
+  const _OverviewContent();
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.topCenter,
+      child: SingleChildScrollView(
+        padding: AppSpacing.pagePadding,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: 720),
+          child: const TodaySummary(
+            completedObjectives: 3,
+            totalObjectives: 5,
+            focusedDuration: Duration(hours: 2, minutes: 35),
+          ),
+        ),
+      ),
+    );
   }
 }
 
