@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../../../app/theme/app_spacing.dart';
 import 'widgets/today_summary.dart';
 import 'widgets/todays_objectives.dart';
+import 'widgets/work_statistics.dart';
+import 'widgets/streak_consistency.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -101,6 +103,12 @@ class _OverviewContent extends StatelessWidget {
                 totalObjectives: 5,
                 focusedDuration: Duration(hours: 2, minutes: 35),
               );
+              const statistics = WorkStatistics(
+                totalDaysWorked: 128,
+                totalFocusedTime: Duration(hours: 342, minutes: 30),
+                totalRestTime: Duration(hours: 86, minutes: 15),
+                totalTrackedTime: Duration(hours: 428, minutes: 45),
+              );
               const objectives = TodaysObjectives(
                 objectives: [
                   TodayObjective(
@@ -117,21 +125,55 @@ class _OverviewContent extends StatelessWidget {
                   ),
                 ],
               );
+              const streak = StreakConsistency(
+                dailyStreak: 6,
+                weeklyStreak: 3,
+                week: [
+                  ConsistencyDay(label: 'M', isCompleted: true),
+                  ConsistencyDay(label: 'T', isCompleted: true),
+                  ConsistencyDay(label: 'W', isCompleted: true),
+                  ConsistencyDay(label: 'T', isCompleted: true),
+                  ConsistencyDay(label: 'F', isCompleted: false, isToday: true),
+                  ConsistencyDay(label: 'S', isCompleted: false),
+                  ConsistencyDay(label: 'S', isCompleted: false),
+                ],
+              );
 
               if (constraints.maxWidth >= 840) {
-                return const Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                return const Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Expanded(flex: 4, child: summary),
-                    SizedBox(width: AppSpacing.lg),
-                    Expanded(flex: 6, child: objectives),
+                    streak,
+                    SizedBox(height: AppSpacing.lg),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          flex: 4,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              summary,
+                              SizedBox(height: AppSpacing.md),
+                              statistics,
+                            ],
+                          ),
+                        ),
+                        SizedBox(width: AppSpacing.lg),
+                        Expanded(flex: 6, child: objectives),
+                      ],
+                    ),
                   ],
                 );
               }
 
               return const Column(
                 children: [
+                  streak,
+                  SizedBox(height: AppSpacing.md),
                   summary,
+                  SizedBox(height: AppSpacing.md),
+                  statistics,
                   SizedBox(height: AppSpacing.md),
                   objectives,
                 ],
