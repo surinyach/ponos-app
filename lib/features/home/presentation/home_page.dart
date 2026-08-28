@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../app/theme/app_spacing.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -88,17 +90,17 @@ class _FeaturePlaceholder extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: AppSpacing.pagePadding,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(destination.selectedIcon, size: 48),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.md),
             Text(
               destination.label,
               style: Theme.of(context).textTheme.headlineMedium,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.xs),
             Text(
               'This feature will be shaped in the next step.',
               style: Theme.of(context).textTheme.bodyLarge,
