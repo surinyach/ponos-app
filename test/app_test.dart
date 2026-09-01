@@ -4,7 +4,7 @@ import 'package:ponos_app/app/app.dart';
 import 'package:ponos_app/app/theme/app_colors.dart';
 import 'package:ponos_app/app/theme/app_theme.dart';
 import 'package:ponos_app/features/home/presentation/widgets/today_summary.dart';
-import 'package:ponos_app/features/home/presentation/widgets/todays_objectives.dart';
+import 'package:ponos_app/features/home/presentation/widgets/focus_areas.dart';
 import 'package:ponos_app/features/home/presentation/widgets/work_statistics.dart';
 import 'package:ponos_app/features/home/presentation/widgets/streak_consistency.dart';
 
@@ -42,43 +42,65 @@ void main() {
         theme: AppTheme.light,
         home: const Scaffold(
           body: TodaySummary(
-            completedObjectives: 3,
-            totalObjectives: 5,
-            focusedDuration: Duration(hours: 2, minutes: 35),
+            workedDuration: Duration(hours: 6, minutes: 30),
+            expectedDuration: Duration(hours: 11),
+            completedFocusAreas: 1,
+            totalFocusAreas: 3,
           ),
         ),
       ),
     );
 
     expect(find.text('Today'), findsOneWidget);
-    expect(find.text('3 / 5'), findsOneWidget);
-    expect(find.text('2h 35m'), findsOneWidget);
-    expect(find.text('Objectives'), findsOneWidget);
-    expect(find.text('Focused time'), findsOneWidget);
+    expect(find.text('6h 30m'), findsOneWidget);
+    expect(find.text('11h'), findsOneWidget);
+    expect(find.text('Focused today'), findsOneWidget);
+    expect(find.text('Expected today'), findsOneWidget);
+    expect(find.text('1 / 3 focus areas completed'), findsOneWidget);
   });
 
-  testWidgets('shows today objectives and their completion states', (
+  testWidgets('shows focus areas ordered by priority with daily progress', (
     tester,
   ) async {
     await tester.pumpWidget(
       MaterialApp(
         theme: AppTheme.light,
         home: const Scaffold(
-          body: TodaysObjectives(
-            objectives: [
-              TodayObjective(title: 'Completed objective', isCompleted: true),
-              TodayObjective(title: 'Open objective', isCompleted: false),
+          body: FocusAreas(
+            areas: [
+              FocusArea(
+                title: 'Second priority',
+                dailyTarget: Duration(hours: 2),
+                workedToday: Duration(hours: 1),
+                priority: 2,
+              ),
+              FocusArea(
+                title: 'First priority',
+                dailyTarget: Duration(hours: 1),
+                workedToday: Duration(hours: 1),
+                priority: 1,
+              ),
             ],
           ),
         ),
       ),
     );
 
-    expect(find.text("Today's objectives"), findsOneWidget);
-    expect(find.text('Completed objective'), findsOneWidget);
-    expect(find.text('Open objective'), findsOneWidget);
+    expect(find.text('Focus areas'), findsOneWidget);
+    expect(find.text('1h today · 1h/day target'), findsOneWidget);
+    expect(find.text('1h today · 2h/day target'), findsOneWidget);
     expect(find.byIcon(Icons.check_circle), findsOneWidget);
-    expect(find.byIcon(Icons.circle_outlined), findsOneWidget);
+    expect(find.text('50%'), findsOneWidget);
+
+    final labels = tester
+        .widgetList<Text>(find.byType(Text))
+        .map((widget) => widget.data)
+        .whereType<String>()
+        .toList();
+    expect(
+      labels.indexOf('First priority'),
+      lessThan(labels.indexOf('Second priority')),
+    );
   });
 
   testWidgets('shows current streak and weekly consistency', (tester) async {
@@ -133,5 +155,19 @@ void main() {
     expect(find.text('Focused time'), findsOneWidget);
     expect(find.text('Rest time'), findsOneWidget);
     expect(find.text('Tracked time'), findsOneWidget);
+  });
+
+  testWidgets('desktop overview columns share the same height', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(1400, 900));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    await tester.pumpWidget(const PonosApp());
+
+    final summaryRect = tester.getRect(find.byType(TodaySummary));
+    final statisticsRect = tester.getRect(find.byType(WorkStatistics));
+    final areasRect = tester.getRect(find.byType(FocusAreas));
+
+    expect(summaryRect.top, areasRect.top);
+    expect(statisticsRect.bottom, areasRect.bottom);
   });
 }

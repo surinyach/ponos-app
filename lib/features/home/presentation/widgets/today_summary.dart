@@ -5,15 +5,17 @@ import '../../../../app/theme/app_spacing.dart';
 
 class TodaySummary extends StatelessWidget {
   const TodaySummary({
-    required this.completedObjectives,
-    required this.totalObjectives,
-    required this.focusedDuration,
+    required this.workedDuration,
+    required this.expectedDuration,
+    required this.completedFocusAreas,
+    required this.totalFocusAreas,
     super.key,
   });
 
-  final int completedObjectives;
-  final int totalObjectives;
-  final Duration focusedDuration;
+  final Duration workedDuration;
+  final Duration expectedDuration;
+  final int completedFocusAreas;
+  final int totalFocusAreas;
 
   @override
   Widget build(BuildContext context) {
@@ -43,22 +45,27 @@ class TodaySummary extends StatelessWidget {
               children: [
                 Expanded(
                   child: _SummaryMetric(
-                    icon: Icons.task_alt,
-                    value: '$completedObjectives / $totalObjectives',
-                    label: 'Objectives',
+                    icon: Icons.schedule,
+                    value: _formatDuration(workedDuration),
+                    label: 'Focused today',
                     iconColor: colors.primary,
                   ),
                 ),
                 Container(width: 1, height: 40, color: colors.outlineVariant),
                 Expanded(
                   child: _SummaryMetric(
-                    icon: Icons.schedule,
-                    value: _formatDuration(focusedDuration),
-                    label: 'Focused time',
+                    icon: Icons.timelapse_outlined,
+                    value: _formatDuration(expectedDuration),
+                    label: 'Expected today',
                     iconColor: colors.secondary,
                   ),
                 ),
               ],
+            ),
+            const SizedBox(height: AppSpacing.md),
+            _AreasProgress(
+              completed: completedFocusAreas,
+              total: totalFocusAreas,
             ),
           ],
         ),
@@ -73,6 +80,55 @@ class TodaySummary extends StatelessWidget {
     if (hours == 0) return '${minutes}m';
     if (minutes == 0) return '${hours}h';
     return '${hours}h ${minutes}m';
+  }
+}
+
+class _AreasProgress extends StatelessWidget {
+  const _AreasProgress({required this.completed, required this.total});
+
+  final int completed;
+  final int total;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final progress = total == 0 ? 0.0 : (completed / total).clamp(0.0, 1.0);
+
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.sm),
+      decoration: BoxDecoration(
+        color: colors.primary.withValues(alpha: 0.08),
+        borderRadius: AppRadius.control,
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.track_changes_outlined,
+                size: 20,
+                color: colors.primary,
+              ),
+              const SizedBox(width: AppSpacing.xs),
+              Expanded(
+                child: Text(
+                  '$completed / $total focus areas completed',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          LinearProgressIndicator(
+            value: progress,
+            minHeight: 6,
+            borderRadius: const BorderRadius.all(
+              Radius.circular(AppRadius.full),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../app/theme/app_spacing.dart';
 import 'widgets/today_summary.dart';
-import 'widgets/todays_objectives.dart';
+import 'widgets/focus_areas.dart';
 import 'widgets/work_statistics.dart';
 import 'widgets/streak_consistency.dart';
 
@@ -16,7 +16,11 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   static const _destinations = <_Destination>[
     _Destination('Overview', Icons.home_outlined, Icons.home),
-    _Destination('Objectives', Icons.flag_outlined, Icons.flag),
+    _Destination(
+      'Focus areas',
+      Icons.track_changes_outlined,
+      Icons.track_changes,
+    ),
     _Destination('Focus', Icons.timer_outlined, Icons.timer),
     _Destination(
       'Progress',
@@ -99,9 +103,10 @@ class _OverviewContent extends StatelessWidget {
           child: LayoutBuilder(
             builder: (context, constraints) {
               const summary = TodaySummary(
-                completedObjectives: 3,
-                totalObjectives: 5,
-                focusedDuration: Duration(hours: 2, minutes: 35),
+                workedDuration: Duration(hours: 6, minutes: 30),
+                expectedDuration: Duration(hours: 11),
+                completedFocusAreas: 1,
+                totalFocusAreas: 3,
               );
               const statistics = WorkStatistics(
                 totalDaysWorked: 128,
@@ -109,19 +114,25 @@ class _OverviewContent extends StatelessWidget {
                 totalRestTime: Duration(hours: 86, minutes: 15),
                 totalTrackedTime: Duration(hours: 428, minutes: 45),
               );
-              const objectives = TodaysObjectives(
-                objectives: [
-                  TodayObjective(
-                    title: 'Plan the week priorities',
-                    isCompleted: true,
+              const focusAreas = FocusAreas(
+                areas: [
+                  FocusArea(
+                    title: 'Work Placement',
+                    dailyTarget: Duration(hours: 8),
+                    workedToday: Duration(hours: 5),
+                    priority: 1,
                   ),
-                  TodayObjective(
-                    title: 'Complete the project proposal',
-                    isCompleted: false,
+                  FocusArea(
+                    title: 'Personal Project',
+                    dailyTarget: Duration(hours: 2),
+                    workedToday: Duration(minutes: 30),
+                    priority: 2,
                   ),
-                  TodayObjective(
-                    title: 'Review focus session notes',
-                    isCompleted: false,
+                  FocusArea(
+                    title: 'LeetCode',
+                    dailyTarget: Duration(hours: 1),
+                    workedToday: Duration(hours: 1),
+                    priority: 3,
                   ),
                 ],
               );
@@ -145,23 +156,25 @@ class _OverviewContent extends StatelessWidget {
                   children: [
                     streak,
                     SizedBox(height: AppSpacing.lg),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          flex: 4,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              summary,
-                              SizedBox(height: AppSpacing.md),
-                              statistics,
-                            ],
+                    IntrinsicHeight(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(
+                            flex: 4,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Expanded(child: summary),
+                                SizedBox(height: AppSpacing.md),
+                                Expanded(child: statistics),
+                              ],
+                            ),
                           ),
-                        ),
-                        SizedBox(width: AppSpacing.lg),
-                        Expanded(flex: 6, child: objectives),
-                      ],
+                          SizedBox(width: AppSpacing.lg),
+                          Expanded(flex: 6, child: focusAreas),
+                        ],
+                      ),
                     ),
                   ],
                 );
@@ -175,7 +188,7 @@ class _OverviewContent extends StatelessWidget {
                   SizedBox(height: AppSpacing.md),
                   statistics,
                   SizedBox(height: AppSpacing.md),
-                  objectives,
+                  focusAreas,
                 ],
               );
             },
