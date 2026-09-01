@@ -1,13 +1,13 @@
 # Ponos
 
-A minimal Flutter foundation for a personal work and objectives tracker. The
+A Flutter client for a personal work and focus tracker. The
 same codebase targets Android and the web.
 
 ## Current scope
 
 - Responsive Material 3 application shell
 - System light/dark theme support
-- Placeholder areas for overview, objectives, focus cycles, and progress
+- Main-screen previews for focus areas, streaks, and work statistics
 - No backend, persistence, authentication, or state-management dependency yet
 
 ## Structure
@@ -42,6 +42,7 @@ values. Both light and dark modes are first-class.
 ## Run
 
 ```shell
+cd app
 flutter pub get
 flutter run -d android
 flutter run -d chrome
@@ -50,6 +51,7 @@ flutter run -d chrome
 ## Build
 
 ```shell
+cd app
 flutter build apk
 flutter build web
 ```
