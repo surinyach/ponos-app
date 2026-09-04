@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
+from app.api.focus_areas import router as focus_areas_router
 from app.api.health import router as health_router
 from app.core.config import get_settings
 from app.db.session import engine
@@ -22,3 +23,4 @@ app = FastAPI(
     lifespan=lifespan,
 )
 app.include_router(health_router)
+app.include_router(focus_areas_router)

@@ -13,9 +13,10 @@ Alembic owns all schema changes.
 - Basic API test
 - Focus Area, weekday target, and timer execution schema
 - Database-enforced non-overlapping target periods
+- Versioned Focus Areas API contract under `/api/v1/focus-areas`
 
-Focus Area CRUD, authentication, and Flutter integration are intentionally
-outside the current backend scope.
+Focus Area routes currently return `501 Not Implemented`. Database operations,
+authentication, and Flutter integration remain outside the current scope.
 
 ## Run with Docker
 
