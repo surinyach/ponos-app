@@ -11,9 +11,11 @@ Alembic owns all schema changes.
 - Database-aware `GET /health`
 - Docker Compose deployment with private PostgreSQL networking
 - Basic API test
+- Focus Area, weekday target, and timer execution schema
+- Database-enforced non-overlapping target periods
 
-Focus Areas, CRUD, authentication, and Flutter integration are intentionally
-outside this scaffold.
+Focus Area CRUD, authentication, and Flutter integration are intentionally
+outside the current backend scope.
 
 ## Run with Docker
 
