@@ -13,10 +13,9 @@ Alembic owns all schema changes.
 - Basic API test
 - Focus Area, weekday target, and timer execution schema
 - Database-enforced non-overlapping target periods
-- Versioned Focus Areas API contract under `/api/v1/focus-areas`
+- PostgreSQL-backed, versioned Focus Areas API under `/api/v1/focus-areas`
 
-Focus Area routes currently return `501 Not Implemented`. Database operations,
-authentication, and Flutter integration remain outside the current scope.
+Authentication and Flutter integration remain outside the current scope.
 
 ## Run with Docker
 
@@ -30,6 +29,12 @@ docker compose up --build
 The API is available at `http://localhost:8000`. PostgreSQL is not published to
 the host. The API container waits for PostgreSQL, runs `alembic upgrade head`,
 and then starts FastAPI.
+
+Run the complete backend test suite against an isolated, temporary PostgreSQL instance:
+
+```shell
+docker compose -f compose.test.yaml up --build --abort-on-container-exit --exit-code-from api-test
+```
 
 Check readiness:
 

@@ -1,7 +1,6 @@
 from datetime import date
 
 import pytest
-from fastapi.testclient import TestClient
 from pydantic import ValidationError
 
 from app.main import app
@@ -89,19 +88,3 @@ def test_priority_contract_allows_duplicate_priorities() -> None:
     )
 
     assert request.items[0].priority == request.items[1].priority
-
-
-def test_contract_routes_do_not_access_persistence_yet() -> None:
-    with TestClient(app) as client:
-        archived = client.get("/api/v1/focus-areas/archived")
-        created = client.post(
-            "/api/v1/focus-areas",
-            json={
-                "name": "Work placement",
-                "priority": 1,
-                "targets": [target()],
-            },
-        )
-
-    assert archived.status_code == 501
-    assert created.status_code == 501
