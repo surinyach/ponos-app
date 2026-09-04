@@ -3,6 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ponos_app/app/app.dart';
 import 'package:ponos_app/app/theme/app_colors.dart';
 import 'package:ponos_app/app/theme/app_theme.dart';
+import 'package:ponos_app/features/focus_areas/domain/models/focus_area.dart';
+import 'package:ponos_app/features/focus_areas/domain/models/focus_area_target.dart';
 import 'package:ponos_app/features/home/presentation/widgets/today_summary.dart';
 import 'package:ponos_app/features/home/presentation/widgets/focus_areas.dart';
 import 'package:ponos_app/features/home/presentation/widgets/work_statistics.dart';
@@ -62,24 +64,40 @@ void main() {
   testWidgets('shows focus areas ordered by priority with daily progress', (
     tester,
   ) async {
+    final timestamp = DateTime.utc(2026, 9, 1);
+    final targetDate = DateTime(2026, 9, 7);
+    FocusArea area(int id, String name, int priority, int targetMinutes) {
+      return FocusArea(
+        id: id,
+        name: name,
+        priority: priority,
+        createdAt: timestamp,
+        updatedAt: timestamp,
+        targets: [
+          FocusAreaTarget(
+            id: id,
+            focusAreaId: id,
+            weekday: DateTime.monday,
+            targetMinutes: targetMinutes,
+            validFrom: targetDate,
+          ),
+        ],
+      );
+    }
+
     await tester.pumpWidget(
       MaterialApp(
         theme: AppTheme.light,
-        home: const Scaffold(
+        home: Scaffold(
           body: FocusAreas(
+            targetDate: targetDate,
+            workedTodayByAreaId: const {
+              1: Duration(hours: 1),
+              2: Duration(hours: 1),
+            },
             areas: [
-              FocusArea(
-                title: 'Second priority',
-                dailyTarget: Duration(hours: 2),
-                workedToday: Duration(hours: 1),
-                priority: 2,
-              ),
-              FocusArea(
-                title: 'First priority',
-                dailyTarget: Duration(hours: 1),
-                workedToday: Duration(hours: 1),
-                priority: 1,
-              ),
+              area(2, 'Second priority', 2, 120),
+              area(1, 'First priority', 1, 60),
             ],
           ),
         ),

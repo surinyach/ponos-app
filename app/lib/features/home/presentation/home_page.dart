@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/theme/app_spacing.dart';
+import '../../focus_areas/domain/models/focus_area.dart';
+import '../../focus_areas/domain/models/focus_area_target.dart';
 import 'widgets/today_summary.dart';
 import 'widgets/focus_areas.dart';
 import 'widgets/work_statistics.dart';
@@ -114,26 +116,17 @@ class _OverviewContent extends StatelessWidget {
                 totalRestTime: Duration(hours: 86, minutes: 15),
                 totalTrackedTime: Duration(hours: 428, minutes: 45),
               );
-              const focusAreas = FocusAreas(
+              final focusAreas = FocusAreas(
+                targetDate: DateTime(2026, 9, 7),
+                workedTodayByAreaId: const {
+                  1: Duration(hours: 5),
+                  2: Duration(minutes: 30),
+                  3: Duration(hours: 1),
+                },
                 areas: [
-                  FocusArea(
-                    title: 'Work Placement',
-                    dailyTarget: Duration(hours: 8),
-                    workedToday: Duration(hours: 5),
-                    priority: 1,
-                  ),
-                  FocusArea(
-                    title: 'Personal Project',
-                    dailyTarget: Duration(hours: 2),
-                    workedToday: Duration(minutes: 30),
-                    priority: 2,
-                  ),
-                  FocusArea(
-                    title: 'LeetCode',
-                    dailyTarget: Duration(hours: 1),
-                    workedToday: Duration(hours: 1),
-                    priority: 3,
-                  ),
+                  _mockFocusArea(1, 'Work Placement', 1, 480),
+                  _mockFocusArea(2, 'Personal Project', 2, 120),
+                  _mockFocusArea(3, 'LeetCode', 3, 60),
                 ],
               );
               const streak = StreakConsistency(
@@ -151,7 +144,7 @@ class _OverviewContent extends StatelessWidget {
               );
 
               if (constraints.maxWidth >= 840) {
-                return const Column(
+                return Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     streak,
@@ -180,7 +173,7 @@ class _OverviewContent extends StatelessWidget {
                 );
               }
 
-              return const Column(
+              return Column(
                 children: [
                   streak,
                   SizedBox(height: AppSpacing.md),
@@ -237,4 +230,24 @@ class _Destination {
   final String label;
   final IconData icon;
   final IconData selectedIcon;
+}
+
+FocusArea _mockFocusArea(int id, String name, int priority, int targetMinutes) {
+  final timestamp = DateTime.utc(2026, 9, 1);
+  return FocusArea(
+    id: id,
+    name: name,
+    priority: priority,
+    createdAt: timestamp,
+    updatedAt: timestamp,
+    targets: [
+      FocusAreaTarget(
+        id: id,
+        focusAreaId: id,
+        weekday: DateTime.monday,
+        targetMinutes: targetMinutes,
+        validFrom: DateTime(2026, 9, 7),
+      ),
+    ],
+  );
 }

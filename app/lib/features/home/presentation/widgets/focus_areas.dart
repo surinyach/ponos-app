@@ -2,37 +2,26 @@ import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_radius.dart';
 import '../../../../app/theme/app_spacing.dart';
-
-class FocusArea {
-  const FocusArea({
-    required this.title,
-    required this.dailyTarget,
-    required this.workedToday,
-    required this.priority,
-  });
-
-  final String title;
-  final Duration dailyTarget;
-  final Duration workedToday;
-  final int priority;
-
-  bool get isCompleted => workedToday >= dailyTarget;
-
-  double get progress {
-    if (dailyTarget.inMinutes == 0) return 1;
-    return (workedToday.inMinutes / dailyTarget.inMinutes).clamp(0, 1);
-  }
-}
+import '../../../focus_areas/domain/models/focus_area.dart';
 
 class FocusAreas extends StatelessWidget {
-  const FocusAreas({required this.areas, this.onAreaPressed, super.key});
+  const FocusAreas({
+    required this.areas,
+    required this.workedTodayByAreaId,
+    this.targetDate,
+    this.onAreaPressed,
+    super.key,
+  });
 
   final List<FocusArea> areas;
+  final Map<int, Duration> workedTodayByAreaId;
+  final DateTime? targetDate;
   final ValueChanged<FocusArea>? onAreaPressed;
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final date = targetDate ?? DateTime.now();
     final sortedAreas = [...areas]
       ..sort((first, second) => first.priority.compareTo(second.priority));
     final backgroundColor = Color.alphaBlend(
@@ -68,11 +57,16 @@ class FocusAreas extends StatelessWidget {
             else
               ...List.generate(sortedAreas.length, (index) {
                 final area = sortedAreas[index];
+                final target = area.targetFor(date)?.targetDuration;
+                final workedToday =
+                    workedTodayByAreaId[area.id] ?? Duration.zero;
 
                 return Column(
                   children: [
                     _FocusAreaRow(
                       area: area,
+                      dailyTarget: target,
+                      workedToday: workedToday,
                       onPressed: onAreaPressed == null
                           ? null
                           : () => onAreaPressed!(area),
@@ -90,21 +84,38 @@ class FocusAreas extends StatelessWidget {
 }
 
 class _FocusAreaRow extends StatelessWidget {
-  const _FocusAreaRow({required this.area, this.onPressed});
+  const _FocusAreaRow({
+    required this.area,
+    required this.dailyTarget,
+    required this.workedToday,
+    this.onPressed,
+  });
 
   final FocusArea area;
+  final Duration? dailyTarget;
+  final Duration workedToday;
   final VoidCallback? onPressed;
+
+  bool get isCompleted => dailyTarget != null && workedToday >= dailyTarget!;
+
+  double get progress {
+    if (dailyTarget == null) return 0;
+    if (dailyTarget!.inMinutes == 0) return 1;
+    return (workedToday.inMinutes / dailyTarget!.inMinutes).clamp(0, 1);
+  }
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    final completed = area.isCompleted;
 
     return Semantics(
       button: onPressed != null,
-      label:
-          '${area.title}: ${_formatDuration(area.workedToday)} of ${_formatDuration(area.dailyTarget)}',
-      value: completed ? 'Daily target completed' : 'Daily target in progress',
+      label: dailyTarget == null
+          ? '${area.name}: no target for today'
+          : '${area.name}: ${_formatDuration(workedToday)} of ${_formatDuration(dailyTarget!)}',
+      value: isCompleted
+          ? 'Daily target completed'
+          : 'Daily target in progress',
       excludeSemantics: true,
       child: InkWell(
         onTap: onPressed,
@@ -118,7 +129,7 @@ class _FocusAreaRow extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      area.title,
+                      area.name,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
@@ -127,11 +138,11 @@ class _FocusAreaRow extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: AppSpacing.sm),
-                  if (completed)
+                  if (isCompleted)
                     Icon(Icons.check_circle, size: 20, color: colors.primary)
                   else
                     Text(
-                      '${(area.progress * 100).round()}%',
+                      '${(progress * 100).round()}%',
                       style: Theme.of(context).textTheme.labelMedium?.copyWith(
                         color: colors.onSurfaceVariant,
                       ),
@@ -140,14 +151,16 @@ class _FocusAreaRow extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.xxs),
               Text(
-                '${_formatDuration(area.workedToday)} today · ${_formatDuration(area.dailyTarget)}/day target',
+                dailyTarget == null
+                    ? '${_formatDuration(workedToday)} today · No target today'
+                    : '${_formatDuration(workedToday)} today · ${_formatDuration(dailyTarget!)}/day target',
                 style: Theme.of(
                   context,
                 ).textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant),
               ),
               const SizedBox(height: AppSpacing.xs),
               LinearProgressIndicator(
-                value: area.progress,
+                value: progress,
                 minHeight: 6,
                 borderRadius: const BorderRadius.all(
                   Radius.circular(AppRadius.full),
