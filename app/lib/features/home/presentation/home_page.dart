@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../app/theme/app_spacing.dart';
 import '../../focus_areas/domain/models/focus_area.dart';
 import '../../focus_areas/domain/models/focus_area_target.dart';
+import '../../focus_areas/presentation/focus_areas_page.dart';
 import 'widgets/today_summary.dart';
 import 'widgets/focus_areas.dart';
 import 'widgets/work_statistics.dart';
@@ -38,9 +39,14 @@ class _HomePageState extends State<HomePage> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final useNavigationRail = constraints.maxWidth >= 700;
-        final content = _selectedIndex == 0
-            ? const _OverviewContent()
-            : _FeaturePlaceholder(destination: _destinations[_selectedIndex]);
+        final content = switch (_selectedIndex) {
+          0 => const _OverviewContent(),
+          1 => FocusAreasPage(
+            onCreate: () => _showPendingAction('Create Focus Area'),
+            onAreaSelected: (area) => _showPendingAction('Edit ${area.name}'),
+          ),
+          _ => _FeaturePlaceholder(destination: _destinations[_selectedIndex]),
+        };
 
         return Scaffold(
           appBar: AppBar(title: const Text('Ponos')),
@@ -88,6 +94,12 @@ class _HomePageState extends State<HomePage> {
 
   void _selectDestination(int index) {
     setState(() => _selectedIndex = index);
+  }
+
+  void _showPendingAction(String action) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('$action will be added in the next step.')),
+    );
   }
 }
 

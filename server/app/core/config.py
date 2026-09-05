@@ -20,6 +20,21 @@ class Settings(BaseSettings):
     database_name: str = "ponos"
     database_user: str = "ponos"
     database_password: str = "ponos"
+    cors_origins: str = ""
+
+    @property
+    def cors_allowed_origins(self) -> list[str]:
+        return [
+            origin.strip()
+            for origin in self.cors_origins.split(",")
+            if origin.strip()
+        ]
+
+    @property
+    def cors_allow_origin_regex(self) -> str | None:
+        if self.environment in {"development", "test"}:
+            return r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$"
+        return None
 
     @property
     def database_url(self) -> str:
